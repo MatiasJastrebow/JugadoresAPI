@@ -16,20 +16,41 @@ namespace PruebaAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult GetAll()
         {
             List<Jugador> jugadores = this.jugadoresService.GetAll();
             return Ok(jugadores);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(long id)
+        public IActionResult GetById(long id)
         {
             Jugador? posibleJugador = this.jugadoresService.GetById(id);
 
             if (posibleJugador == null) return NotFound();
 
             return Ok(posibleJugador);
+        }
+
+        [HttpGet("mayores-a/{edad}")]
+        public IActionResult GetMayoresA(int edad)
+        {
+            List<Jugador> jugadores = this.jugadoresService.GetMayoresA(edad);
+            return Ok(jugadores);
+        }
+
+        [HttpGet("anios-de-experiencia-mayor-a/{anios}")]
+        public IActionResult GetConMayorExperienciaA(int anios)
+        {
+            List<String> jugadores = this.jugadoresService.GetJugadoresConMasExperienciaAFor(anios);
+            return Ok(jugadores);
+        }
+
+        [HttpGet("entre-18-y-25-cuyo-nombre-contiene/{cadena}")]
+        public IActionResult GetNombreContiene(string cadena)
+        {
+            List<Jugador> jugadores = this.jugadoresService.GetJugadoresCuyoNombreContieneA(cadena);
+            return Ok(jugadores);
         }
 
         [HttpPost]
