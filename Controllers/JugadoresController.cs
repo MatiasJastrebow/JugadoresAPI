@@ -62,7 +62,7 @@ namespace PruebaAPI.Controllers
                 
                 if (jugadorNuevo != null)
                 {
-                    return CreatedAtAction(nameof(Get), new { id = jugadorNuevo.Id }, jugadorNuevo);
+                    return CreatedAtAction(nameof(GetById), new { id = jugadorNuevo.Id }, jugadorNuevo);
                 }
             }
 
