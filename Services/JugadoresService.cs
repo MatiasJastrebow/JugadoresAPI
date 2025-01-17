@@ -1,144 +1,123 @@
-﻿using System.Collections.Generic;
+﻿using PruebaAPI.Models;
 using PruebaAPI.DTOs;
+using PruebaAPI.Interfaces.ServicesInterfaces;
+using PruebaAPI.Interfaces.ModelsInterfaces;
 
 namespace PruebaAPI.Services
 {
-    public class JugadoresService
+    public class JugadoresService : IJugadoresService
     {
-        private readonly List<Jugador> Jugadores;
+        private static long lastId = 0; 
+        private readonly List<IJugador> Jugadores;
 
         public JugadoresService()
         {
-            this.Jugadores = new List<Jugador>
+            this.Jugadores = new List<IJugador>
             {
-                new (new DateOnly (2004, 5, 18), "Matias", 3)
+                new Jugador (0, new DateOnly (2004, 5, 18), "Matias", 3)
             };
         }
 
         //GET
-        public List<Jugador> GetAll()
+        public IList<IJugador> GetAll()
         {
             return this.Jugadores;
         }
 
-        public Jugador? GetById(long id)
+        public IJugador GetById(long id)
         {
-            return this.Jugadores.FirstOrDefault(j => j.Id == id);
+            return this.Jugadores.FirstOrDefault(j => j.id == id);
         }
 
-        public List<Jugador> GetMayoresA(int edad)
+        public IList<IJugador> GetMayoresA(int edad)
         {
             return this.Jugadores.FindAll(j => j.GetEdad() > edad);
         }
 
-        public List<Jugador> GetMayoresAFor(int edad)
+        public IList<IJugador> GetMayoresAFor(int edad)
         {
-            List<Jugador> lista = new();
-
+            List<IJugador> lista = new();
             for (int i = 0; i < Jugadores.Count; i++)
             {
                 if (Jugadores[i].GetEdad() > edad) lista.Add(Jugadores[i]);
             }
-
             return lista;
         }
 
-        public List<String> GetJugadoresConMasExperienciaA(int anios)
+        public IList<String> GetJugadoresConMasExperienciaA(int anios)
         {
-            List<Jugador> lista = this.Jugadores.FindAll(j => j.AniosExperiencia > anios);
-            return lista.ConvertAll(j => j.Nombre);
+            List<IJugador> lista = this.Jugadores.FindAll(j => j.experienceInYears > anios);
+            return lista.ConvertAll(j => j.name);
         }
 
-        public List<String> GetJugadoresConMasExperienciaAFor(int anios)
+        public IList<String> GetJugadoresConMasExperienciaAFor(int anios)
         {
-            List<Jugador> listaJugadores = new();
-
+            List<IJugador> listaJugadores = new();
             for (int i = 0; i < Jugadores.Count; i++)
             {
-                if (Jugadores[i].AniosExperiencia > anios) listaJugadores.Add(Jugadores[i]);
+                if (Jugadores[i].experienceInYears > anios) listaJugadores.Add(Jugadores[i]);
             }
-
             return this.ObtenerNombres(listaJugadores);
         }
 
-        public List<Jugador> GetJugadoresCuyoNombreContieneA(string cadena)
+        public IList<IJugador> GetJugadoresCuyoNombreContieneA(string cadena)
         {
-            return this.Jugadores.FindAll(j => j.Nombre.Contains(cadena) && j.GetEdad() < 25 && j.GetEdad() > 18);
+            return this.Jugadores.FindAll(j => j.name.Contains(cadena) && j.GetEdad() < 25 && j.GetEdad() > 18);
         }
 
-        public List<Jugador> GetJugadoresCuyoNombreContieneAFor(string cadena)
+        public IList<IJugador> GetJugadoresCuyoNombreContieneAFor(string cadena)
         {
-            List<Jugador> lista = new();
-
+            List<IJugador> lista = new();
             for (int i = 0; i < Jugadores.Count; i++)
             {
-                if (Jugadores[i].GetEdad() > 18 && Jugadores[i].GetEdad() < 25 && Jugadores[i].NombreContiene(cadena)) lista.Add(Jugadores[i]);
+                if (Jugadores[i].GetEdad() > 18 && Jugadores[i].GetEdad() < 25 && Jugadores[i].NombreContieneCadena(cadena)) lista.Add(Jugadores[i]);
             }
-
             return lista;
         }
 
         //POST
-        public Jugador? Crear(JugadorDto jugadorDto)
+        public IJugador Crear(JugadorDto jugadorDto)
         {
-
-            if (jugadorDto.FechaNac != null && jugadorDto.Nombre != null && jugadorDto.AniosExperiencia != null)
+            if (jugadorDto.birthDate is not null && jugadorDto.name is not null && jugadorDto.experienceInYears is not null)
             {
-                Jugador jugador = new(jugadorDto.FechaNac.GetValueOrDefault(), jugadorDto.Nombre, jugadorDto.AniosExperiencia.GetValueOrDefault());
+                Jugador jugador = new(++lastId, jugadorDto.birthDate.GetValueOrDefault(), jugadorDto.name, jugadorDto.experienceInYears.GetValueOrDefault());
                 this.Jugadores.Add(jugador);
                 return jugador;
             }
-
             return null;
         }
 
         //PUT
-        public Jugador? Modificar(long id, JugadorDto jugadorDto)
+        public IJugador Modificar(long id, JugadorDto jugadorDto)
         {
-            Jugador? jugador = this.GetById(id);
-
-            if (jugador != null)
+            var jugador = this.GetById(id);
+            if (jugador is not null)
             {
-                if (jugadorDto.FechaNac.HasValue)
-                {
-                    jugador.FechaNac = jugadorDto.FechaNac.GetValueOrDefault();
-                }
-
-                if (jugadorDto.Nombre != null)
-                {
-                    jugador.Nombre = jugadorDto.Nombre;
-                }
-
-                if (jugadorDto.AniosExperiencia.HasValue)
-                {
-                    jugador.AniosExperiencia = jugadorDto.AniosExperiencia.GetValueOrDefault();
-                }
-
+                if (jugadorDto.birthDate.HasValue)
+                    jugador.birthDate = jugadorDto.birthDate.GetValueOrDefault();
+                if (jugadorDto.name is not null)
+                    jugador.name = jugadorDto.name;
+                if (jugadorDto.experienceInYears.HasValue)
+                    jugador.experienceInYears = jugadorDto.experienceInYears.GetValueOrDefault();
                 return jugador;
             }
-
             return null;
         }
 
         //DELETE
         public void Eliminar(long id)
         {
-            Jugador? jugador = this.GetById(id);
-
-            if (jugador != null)
-            {
-                this.Jugadores.Remove(jugador);
-            }
+            var jugador = this.GetById(id);
+            if (jugador is not null) this.Jugadores.Remove(jugador);
         }
 
-
         //Metodos auxiliares
-        public List<String> ObtenerNombres (List<Jugador> jugadores)
+        public List<String> ObtenerNombres (IList<IJugador> jugadores)
         {
             List<String> result = new();
             for (int i = 0; i < jugadores.Count; i++)
             {
-                result.Add(jugadores[i].Nombre);
+                result.Add(jugadores[i].name);
             }
             return result;
         }

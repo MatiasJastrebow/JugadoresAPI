@@ -1,55 +1,47 @@
-﻿namespace PruebaAPI
+﻿using PruebaAPI.Interfaces.ModelsInterfaces;
+
+namespace PruebaAPI.Models
 {
-    public class Jugador
+    public class Jugador: IJugador
     {
-        private static long UltimoId = 0;
+        public long id { get; private set; }
+        public DateOnly birthDate {  get; set; }    
+        public string name { get; set; }
+        public int experienceInYears { get; set; }
 
-        public long Id { get; private set; }
-        public DateOnly FechaNac {  get; set; }    
-        public string Nombre { get; set; }
-        public int AniosExperiencia { get; set; }
-
-        public Jugador (DateOnly _FechaNac, string _Nombre, int _AniosExperiencia)
+        public Jugador (long _id, DateOnly _birthDate, string _name, int _experienceInYears)
         {
-            this.Id = ++UltimoId;
-            this.FechaNac = _FechaNac;
-            this.Nombre = _Nombre;
-            this.AniosExperiencia = _AniosExperiencia;
+            this.id = _id;
+            this.birthDate = _birthDate;
+            this.name = _name;
+            this.experienceInYears = _experienceInYears;
         }
 
         public int GetEdad()
         {
-            DateOnly fechaActual = DateOnly.FromDateTime(DateTime.Now);
-            int edad = fechaActual.Year - this.FechaNac.Year;
-
-            if (fechaActual < this.FechaNac.AddYears(edad))
-            {
-                edad--;
-            }
-
-            return edad;
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var age = today.Year - this.birthDate.Year;
+            if (today < this.birthDate.AddYears(age)) age--;
+            return age;
         }
 
-        public Boolean NombreContiene(string cadena)
+        public Boolean NombreContieneCadena(string _string)
         {
-            if (cadena.Length > this.Nombre.Length) return false;
-            if (cadena.Length.Equals(0)) return true; //Supongo que la cadena vacia siempre la contiene 
-
-            for (int i = 0; i < this.Nombre.Length; i++ )
+            if (_string.Length > this.name.Length) return false;
+            if (_string.Length.Equals(0)) return true; //Supongo que la cadena vacia siempre la contiene 
+            for (var i = 0; i < this.name.Length; i++ )
             {
-                bool resultado = true;
-                for (int j = 0; j < cadena.Length; j++)
+                var resultado = true;
+                for (var j = 0; j < _string.Length; j++)
                 {
-                    if (this.Nombre[i + j] != cadena[j])
+                    if (this.name[i + j] != _string[j])
                     {
                         resultado = false;
                         break;
                     }
                 }
-
                 if (resultado) return true;
             }
-
             return false;
         }
     }
